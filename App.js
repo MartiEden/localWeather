@@ -1,20 +1,39 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import * as Location from 'expo-location';
+import Content from './components/Content'
 
-export default function App() {
+const App = () => {
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  const getPosition = async () => {
+
+      let response = await Location.requestForegroundPermissionsAsync();
+console.log(response);
+ 
+      if(!response.granted){ 
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+      let current_location = await Location.getCurrentPositionAsync();
+      setLocation(current_location);
+    console.log(current_location);
+  };
+
+  useEffect(() => {
+    getPosition(); 
+  }, []);
+
+  let text = 'Fetching...'; 
+  if (errorMsg) {
+    text = errorMsg;
+  } else if (location) {
+    text = JSON.stringify(location);
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Content text={text} />
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
