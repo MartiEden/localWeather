@@ -5,26 +5,27 @@ import Content from './components/Content'
 const App = () => {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  let text = 'Fetching...';
 
   const getPosition = async () => {
 
-      let response = await Location.requestForegroundPermissionsAsync();
-console.log(response);
- 
-      if(!response.granted){ 
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
+    try {
+
+      await Location.requestForegroundPermissionsAsync();
+
       let current_location = await Location.getCurrentPositionAsync();
       setLocation(current_location);
-    console.log(current_location);
+      console.log(current_location);
+
+    } catch (error) {
+      setErrorMsg('Permission to access location was denied');
+    }
   };
 
   useEffect(() => {
-    getPosition(); 
+    getPosition();
   }, []);
 
-  let text = 'Fetching...'; 
   if (errorMsg) {
     text = errorMsg;
   } else if (location) {
